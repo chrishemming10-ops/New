@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recruiter Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&display=swap">
+<script src="/vendor/marked.min.js"></script>
+<style>
+/* Layout: a calm desk — one header band, a grid of five workflow tiles, then a focused two-pane workspace. */
+:root {
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --ink: #17221f;
+  --muted: #5b6a65;
+  --line: #d9e1de;
+  --accent: #0f6b5c;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2f0ec;
+  --warn: #9a4b12;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1614; --surface: #17201d; --ink: #e5ece9; --muted: #98a8a2; --line: #2a3632;
+    --accent: #4fc2a9; --accent-ink: #08221c; --accent-soft: #1b322c; --warn: #e8a36b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1614; --surface: #17201d; --ink: #e5ece9; --muted: #98a8a2; --line: #2a3632;
+  --accent: #4fc2a9; --accent-ink: #08221c; --accent-soft: #1b322c; --warn: #e8a36b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.55 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 28px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 2rem; letter-spacing: -0.01em; }
+.tag { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.lede { color: var(--muted); max-width: 60ch; margin: 6px 0 0; }
+
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.tile {
+  all: unset; cursor: pointer; display: grid; gap: 10px; align-content: start;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 18px; transition: border-color .15s, transform .15s;
+}
+.tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tile .mark {
+  width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent); font: 700 .85rem var(--font-display);
+}
+.tile h3 { font-size: 1.1rem; }
+.tile p { margin: 0; color: var(--muted); font-size: .9rem; }
+.tile .go { color: var(--accent); font-weight: 600; font-size: .85rem; margin-top: auto; }
+
+.workspace { display: grid; gap: 20px; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); align-items: start; }
+@media (max-width: 760px) { .workspace { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.back { all: unset; cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem; }
+.back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.drop {
+  border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 22px 14px; text-align: center;
+  color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s;
+}
+.drop.over, .drop:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+.drop strong { color: var(--ink); display: block; margin-bottom: 4px; }
+.files { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.files li { display: flex; justify-content: space-between; gap: 8px; font-size: .88rem; background: var(--bg); border-radius: 6px; padding: 6px 10px; }
+.files li span { overflow-wrap: anywhere; }
+.files button { all: unset; cursor: pointer; color: var(--muted); }
+label { font-weight: 600; font-size: .85rem; }
+textarea {
+  width: 100%; min-height: 90px; resize: vertical; font: inherit; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px;
+}
+textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.btn {
+  font: 600 1rem var(--font-body); border: 0; border-radius: 8px; padding: 12px 16px; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink);
+}
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); padding: 6px 12px; font-size: .85rem; }
+.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.out-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.status { font-size: .85rem; color: var(--muted); }
+.output { min-height: 240px; overflow-wrap: anywhere; }
+.output.empty { color: var(--muted); display: grid; place-items: center; text-align: center; }
+.output h1, .output h2, .output h3 { margin: 1.1em 0 .4em; font-size: 1.15rem; }
+.output h1:first-child, .output h2:first-child, .output h3:first-child { margin-top: 0; }
+.output table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.output .tbl { overflow-x: auto; }
+.output th, .output td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+.output th { background: var(--bg); }
+.err { color: var(--warn); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <span class="tag">Recruiter Desk</span>
+      <h1 id="page-title">What are you working on?</h1>
+      <p class="lede" id="page-lede">Pick a workflow, attach the document, and get finished copy back in seconds. The prompt is already written for you.</p>
+    </div>
+  </header>
+
+  <section id="home" class="grid" aria-label="Workflows"></section>
+
+  <section id="work" class="workspace" hidden>
+    <form class="panel" id="form">
+      <button type="button" class="back" id="back">← All workflows</button>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="attach-hint">
+        <strong>Drop files here or click to browse</strong>
+        <span id="attach-hint"></span>
+        <div style="font-size:.8rem;margin-top:6px">PDF, Word (.docx), text or image · up to 5 files</div>
+      </div>
+      <input type="file" id="file" multiple accept=".pdf,.docx,.txt,.md,.csv,.png,.jpg,.jpeg,.webp" hidden>
+      <ul class="files" id="files"></ul>
+      <label for="notes">Extra notes <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <textarea id="notes" placeholder="Anything to add, e.g. 'client is a 4-surgery practice in Hove, wants Saturdays'. You can also paste text here instead of attaching a file."></textarea>
+      <button class="btn" id="run" type="submit">Generate</button>
+    </form>
+
+    <div class="panel">
+      <div class="out-head">
+        <h2 id="out-title" style="font-size:1.2rem">Result</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="status" id="status" aria-live="polite"></span>
+          <button class="btn ghost" id="copy" type="button" hidden>Copy</button>
+        </div>
+      </div>
+      <div class="output empty" id="output">Your result will appear here.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let workflows = [];
+let current = null;
+let picked = [];
+let rawText = "";
+
+function initials(t) { return t.split(/[\s–→&-]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase(); }
+
+async function load() {
+  workflows = await (await fetch("/api/workflows")).json();
+  $("home").innerHTML = "";
+  for (const w of workflows) {
+    const b = document.createElement("button");
+    b.className = "tile";
+    b.innerHTML = `<span class="mark"></span><h3></h3><p></p><span class="go">Start →</span>`;
+    b.querySelector(".mark").textContent = initials(w.title);
+    b.querySelector("h3").textContent = w.title;
+    b.querySelector("p").textContent = w.blurb;
+    b.onclick = () => open(w);
+    $("home").append(b);
+  }
+}
+
+function open(w) {
+  current = w; picked = []; rawText = "";
+  $("page-title").textContent = w.title;
+  $("page-lede").textContent = w.blurb;
+  $("attach-hint").textContent = w.attach;
+  $("notes").value = "";
+  renderFiles();
+  setOutput(null);
+  $("home").hidden = true; $("work").hidden = false;
+  window.scrollTo(0, 0);
+}
+
+function home() {
+  $("work").hidden = true; $("home").hidden = false;
+  $("page-title").textContent = "What are you working on?";
+  $("page-lede").textContent = "Pick a workflow, attach the document, and get finished copy back in seconds. The prompt is already written for you.";
+}
+
+function renderFiles() {
+  $("files").innerHTML = "";
+  picked.forEach((f, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span></span><button type="button" aria-label="Remove">✕</button>`;
+    li.querySelector("span").textContent = f.name;
+    li.querySelector("button").onclick = () => { picked.splice(i, 1); renderFiles(); };
+    $("files").append(li);
+  });
+}
+
+function addFiles(list) {
+  for (const f of list) if (picked.length < 5) picked.push(f);
+  renderFiles();
+}
+
+function setOutput(text, isError) {
+  const o = $("output");
+  if (text === null) { o.className = "output empty"; o.textContent = "Your result will appear here."; $("copy").hidden = true; $("status").textContent = ""; return; }
+  o.className = "output";
+  if (isError) { o.innerHTML = `<p class="err"></p>`; o.firstChild.textContent = text; return; }
+  o.innerHTML = window.marked ? marked.parse(text) : text.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  o.querySelectorAll("table").forEach(t => { const d = document.createElement("div"); d.className = "tbl"; t.replaceWith(d); d.append(t); });
+}
+
+$("back").onclick = home;
+$("drop").onclick = () => $("file").click();
+$("drop").onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("file").click(); } };
+$("file").onchange = (e) => { addFiles(e.target.files); e.target.value = ""; };
+["dragenter", "dragover"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", e => addFiles(e.dataTransfer.files));
+
+$("copy").onclick = async () => {
+  try { await navigator.clipboard.writeText(rawText); $("status").textContent = "Copied"; }
+  catch { const r = document.createRange(); r.selectNodeContents($("output")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("status").textContent = "Selected — press Ctrl+C"; }
+};
+
+$("form").onsubmit = async (e) => {
+  e.preventDefault();
+  if (!picked.length && !$("notes").value.trim()) { setOutput("Attach a document or paste some text first.", true); return; }
+  const fd = new FormData();
+  picked.forEach(f => fd.append("files", f));
+  fd.append("notes", $("notes").value);
+  $("run").disabled = true; $("copy").hidden = true; rawText = "";
+  $("status").textContent = "Reading your document…";
+  setOutput("");
+  try {
+    const res = await fetch(`/api/run/${current.id}`, { method: "POST", body: fd });
+    if (!res.ok) { const j = await res.json().catch(() => ({})); throw new Error(j.error || `Request failed (${res.status})`); }
+    const reader = res.body.getReader(); const dec = new TextDecoder();
+    $("status").textContent = "Writing…";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      rawText += dec.decode(value, { stream: true });
+      setOutput(rawText);
+    }
+    $("status").textContent = "Done"; $("copy").hidden = false;
+  } catch (err) {
+    setOutput(err.message, true); $("status").textContent = "";
+  } finally { $("run").disabled = false; }
+};
+
+load();
+</script>
+</body>
+</html>
